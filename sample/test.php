@@ -1,21 +1,15 @@
-<h1 align="center"> flysystem-tencent-cos </h1>
+<?php
+/**
+ * Created by PhpStorm.
+ * User: zzhpeng
+ * Date: 23/6/2020
+ * Time: 12:42 AM
+ */
+require dirname(__FILE__) . '/../vendor/autoload.php';
 
-<p align="center"> Tencent Cos Storage adapter for flysystem - a PHP filesystem abstraction.</p>
-
-
-## Installing
-
-```shell
-$ composer require chunpat/flysystem-tencent-cos -vvv
-```
-
-## Usage
-
-```php
-
-$secretId = "your secretId";
-$secretKey = "your secretKey";
-$region = "ap-guangzhou"; //set a default bucket region 设置一个默认的存储桶地域 
+$secretId = "######"; //"云 API 密钥 SecretId";
+$secretKey = "######"; //"云 API 密钥 SecretKey";
+$region = "ap-guangzhou"; //设置一个默认的存储桶地域
 $cosClient = new Qcloud\Cos\Client(
     array(
         'region' => $region,
@@ -24,7 +18,10 @@ $cosClient = new Qcloud\Cos\Client(
             'secretId'  => $secretId ,
             'secretKey' => $secretKey)));
 $bucket = "zzhpeng-1256184324"; //存储桶名称 格式：BucketName-APPID
-$key = "exampleobject"; //filename or path
+$key = "exampleobject";
+
+//$cosClient->GetBucketRequest();
+//exit;
 
 
 $adapter = new \Chunpat\FlysystemTencentCos\Adapter($cosClient,$bucket);
@@ -41,7 +38,7 @@ try {
     $config = [
         "Content-Type" => $mimeType
     ];
-//  $filePath = "test";
+//    $filePath = "test";
     $filePath = "niubi/6666666";
 
 // 上传
@@ -124,29 +121,3 @@ try {
 } catch (\Exception $e) {
     echo "$e\n";
 }
-
-
-```
-
-## Contributing
-
-You can contribute in one of three ways:
-
-1. File bug reports using the [issue tracker](https://github.com/chunpat/flysystem-tencent-cos/issues).
-2. Answer questions or fix bugs on the [issue tracker](https://github.com/chunpat/flysystem-tencent-cos/issues).
-3. Contribute new features or update the wiki.
-
-_The code contribution process is not very formal. You just need to make sure that you follow the PSR-0, PSR-1, and PSR-2 coding guidelines. Any new code contributions must be accompanied by unit tests where applicable._
-
-## Document
-- 1、https://github.com/tencentyun/cos-php-sdk-v5
-- 2、https://cloud.tencent.com/document/product/436/12266#composer
-
-## Reference
-- 1、https://github.com/thephpleague/flysystem
-- 2、http://flysystem.thephpleague.com/api/
-
-## License
-
-MIT
-

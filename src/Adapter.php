@@ -21,8 +21,6 @@ use Qcloud\Cos\Client;
 
 class Adapter extends AbstractAdapter implements CanOverwriteFiles
 {
-//    const PUBLIC_GRANT_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
-
     /**
      * @var array
      */
@@ -345,20 +343,6 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     }
 
     /**
-     * @return bool
-     */
-    private function is404Exception(S3Exception $exception)
-    {
-        $response = $exception->getResponse();
-
-        if ($response !== null && $response->getStatusCode() === 404) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Get all the meta data of a file or directory.
      *
      * @param string $path
@@ -429,6 +413,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @param string $newpath
      *
      * @return bool
+     * @throws \Exception
      */
     public function copy($path, $newpath)
     {
@@ -444,6 +429,8 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
         );
 
         $this->client->execute($command);
+
+//        $this->client->copy($this->bucket,$newpath,$path,$this->options);
         return true;
     }
 
@@ -593,23 +580,6 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     protected function upload($path, $body, Config $config)
     {
-//        $key = $this->applyPathPrefix($path);
-//        $options = $this->getOptionsFromConfig($config);
-//        $acl = array_key_exists('ACL', $options) ? $options['ACL'] : 'private';
-//
-//        if (!$this->isOnlyDir($path)) {
-//            if ( ! isset($options['ContentType'])) {
-//                $options['ContentType'] = Util::guessMimeType($path, $body);
-//            }
-//
-//            if ( ! isset($options['ContentLength'])) {
-//                $options['ContentLength'] = is_resource($body) ? Util::getStreamSize($body) : Util::contentSize($body);
-//            }
-//
-//            if ($options['ContentLength'] === null) {
-//                unset($options['ContentLength']);
-//            }
-//        }
         $command = $this->client->getCommand(
             'putObject',
             [
@@ -623,29 +593,6 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
         if (!($result instanceof Result)) {
             throw new ResultException('appear error when upload a file');
         }
-
-//        $key = $this->applyPathPrefix($path);
-//        $options = $this->getOptionsFromConfig($config);
-//        $acl = array_key_exists('ACL', $options) ? $options['ACL'] : 'private';
-//
-//        if (!$this->isOnlyDir($path)) {
-//            if ( ! isset($options['ContentType'])) {
-//                $options['ContentType'] = Util::guessMimeType($path, $body);
-//            }
-//
-//            if ( ! isset($options['ContentLength'])) {
-//                $options['ContentLength'] = is_resource($body) ? Util::getStreamSize($body) : Util::contentSize($body);
-//            }
-//
-//            if ($options['ContentLength'] === null) {
-//                unset($options['ContentLength']);
-//            }
-//        }
-//        try {
-//            $this->s3Client->upload($this->bucket, $key, $body, $acl, ['params' => $options]);
-//        } catch (S3MultipartUploadException $multipartUploadException) {
-//            return false;
-//        }
 
         $this->result = $this->normalizeResponse($result->toArray());
         return true;
@@ -724,37 +671,6 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         return array_merge($result, Util::map($response, static::$resultMap), ['type' => 'file']);
     }
-
-//    /**
-//     * @param string $location
-//     *
-//     * @return bool
-//     */
-//    protected function doesDirectoryExist($location)
-//    {
-//        // Maybe this isn't an actual key, but a prefix.
-//        // Do a prefix listing of objects to determine.
-//        $command = $this->client->getCommand(
-//            'listObjects',
-//            [
-//                'Bucket'  => $this->bucket,
-//                'Prefix'  => rtrim($location, '/') . '/',
-//                'MaxKeys' => 1,
-//            ]
-//        );
-//
-//        try {
-//            $result = $this->client->execute($command);
-//
-//            return $result['Contents'] || $result['CommonPrefixes'];
-//        } catch (S3Exception $e) {
-//            if ($e->getStatusCode() === 403) {
-//                return false;
-//            }
-//
-//            throw $e;
-//        }
-//    }
 
     /**
      * Raw URL encode a key and allow for '/' characters
