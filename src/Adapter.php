@@ -1,13 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zzhpeng
- * Date: 19/6/2020
- * Time: 9:31 AM
+ * This file is part of the chunpat/flysystem-tencent-cos.
+ *
+ * (c) chunpat <chunpat@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled.
  */
 
 namespace Chunpat\FlysystemTencentCos;
-
 
 use Chunpat\FlysystemTencentCos\Exception\ResultException;
 use GuzzleHttp\Command\Result;
@@ -32,7 +32,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
         'Metadata' => 'metadata',
         'StorageClass' => 'storageclass',
         'ETag' => 'etag',
-        'VersionId' => 'versionid'
+        'VersionId' => 'versionid',
     ];
 
     /**
@@ -85,10 +85,8 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * Constructor.
      *
-     * @param ServiceClientInterface $client
-     * @param string                 $bucket
-     * @param string                 $prefix
-     * @param array                  $options
+     * @param string $bucket
+     * @param string $prefix
      */
     public function __construct(ServiceClientInterface $client, $bucket, $prefix = '', array $options = [])
     {
@@ -98,9 +96,6 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
         $this->options = $options;
     }
 
-    /**
-     * @return array
-     */
     public function getResult(): array
     {
         return $this->result;
@@ -143,9 +138,9 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      *
      * @param string $path
      * @param string $contents
-     * @param Config $config
      *
      * @return array|bool|false
+     *
      * @throws ResultException
      */
     public function write($path, $contents, Config $config)
@@ -158,9 +153,9 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      *
      * @param string $path
      * @param string $contents
-     * @param Config $config
      *
      * @return array|bool|false
+     *
      * @throws ResultException
      */
     public function update($path, $contents, Config $config)
@@ -175,6 +170,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @param string $newpath
      *
      * @return bool|\GuzzleHttp\Command\ResultInterface|mixed
+     *
      * @throws ResultException
      */
     public function rename($path, $newpath)
@@ -192,6 +188,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @param string $path
      *
      * @return bool|\GuzzleHttp\Command\ResultInterface|mixed
+     *
      * @throws ResultException
      */
     public function delete($path)
@@ -200,7 +197,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
             'deleteObject',
             [
                 'Bucket' => $this->bucket,
-                'Key' => $path
+                'Key' => $path,
             ]
         );
 
@@ -220,11 +217,13 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @param string $dirname
      *
      * @return bool|\GuzzleHttp\Command\ResultInterface|mixed
+     *
      * @throws ResultException
      */
     public function deleteDir($dirname)
     {
-        $dir = $this->applyPathPrefix($dirname) . '/';
+        $dir = $this->applyPathPrefix($dirname).'/';
+
         return $this->delete($dir);
     }
 
@@ -232,14 +231,14 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * Create a directory.
      *
      * @param string $dirname
-     * @param Config $config
      *
      * @return array|bool|false
+     *
      * @throws ResultException
      */
     public function createDir($dirname, Config $config)
     {
-        return $this->upload($dirname . '/', '', $config);
+        return $this->upload($dirname.'/', '', $config);
     }
 
     /**
@@ -252,7 +251,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     public function has($path)
     {
         try {
-            return $this->client->doesObjectExist($this->bucket,$path,$this->options);
+            return $this->client->doesObjectExist($this->bucket, $path, $this->options);
         } catch (\Exception $e) {
             return false;
         }
@@ -269,6 +268,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     {
         try {
             $response = $this->readObject($path);
+
             return $response;
         } catch (\Exception $e) {
             return false;
@@ -285,10 +285,10 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function listContents($directory = '', $recursive = false)
     {
-        $prefix = $this->applyPathPrefix(rtrim($directory, '/') . '/');
+        $prefix = $this->applyPathPrefix(rtrim($directory, '/').'/');
         $options = ['Bucket' => $this->bucket, 'Prefix' => ltrim($prefix, '/')];
 
-        if ($recursive === false) {
+        if (false === $recursive) {
             $options['Delimiter'] = '/';
         }
 
@@ -301,8 +301,6 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     }
 
     /**
-     * @param array $options
-     *
      * @return array
      */
     protected function retrievePaginatedListing(array $options)
@@ -383,7 +381,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      *
      * @param string   $path
      * @param resource $resource
-     * @param Config   $config Config object
+     * @param Config   $config   Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -397,7 +395,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      *
      * @param string   $path
      * @param resource $resource
-     * @param Config   $config Config object
+     * @param Config   $config   Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -413,6 +411,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @param string $newpath
      *
      * @return bool
+     *
      * @throws \Exception
      */
     public function copy($path, $newpath)
@@ -422,8 +421,8 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
             [
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($newpath),
-                'CopySource' => $this->encodeKey($this->bucket . '/' . $this->applyPathPrefix($path)),
-                'ACL' => $this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC
+                'CopySource' => $this->encodeKey($this->bucket.'/'.$this->applyPathPrefix($path)),
+                'ACL' => AdapterInterface::VISIBILITY_PUBLIC === $this->getRawVisibility($path)
                     ? 'public-read' : 'private',
             ] + $this->options
         );
@@ -440,13 +439,14 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @param string $path
      *
      * @return array|false
+     *
      * @throws ResultException
      */
     public function readStream($path)
     {
         $response = $this->readObject($path);
 
-        if ($response !== false) {
+        if (false !== $response) {
             $response['stream'] = $response['contents']->detach();
             unset($response['contents']);
         }
@@ -460,6 +460,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @param string $path
      *
      * @return array
+     *
      * @throws ResultException
      */
     protected function readObject($path)
@@ -476,6 +477,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
         if (!($response instanceof Result)) {
             throw new ResultException('appear error when read a file');
         }
+
         return $this->normalizeResponse($response->toArray(), $path);
     }
 
@@ -494,7 +496,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
             [
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($path),
-                'ACL' => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
+                'ACL' => AdapterInterface::VISIBILITY_PUBLIC === $visibility ? 'public-read' : 'private',
             ]
         );
 
@@ -557,9 +559,10 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
             foreach ($grant['Grant'] as $grantItem) {
                 if (
                     (isset($grantItem['Grantee']['URI'])
-                        && $grantItem['Permission'] === 'READ') || $grantItem['Permission'] === 'FULL_CONTROL'
+                        && 'READ' === $grantItem['Permission']) || 'FULL_CONTROL' === $grantItem['Permission']
                 ) {
                     $visibility = AdapterInterface::VISIBILITY_PUBLIC;
+
                     break;
                 }
             }
@@ -571,11 +574,11 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * Upload an object.
      *
-     * @param        $path
-     * @param        $body
-     * @param Config $config
+     * @param $path
+     * @param $body
      *
      * @return bool
+     *
      * @throws ResultException
      */
     protected function upload($path, $body, Config $config)
@@ -585,7 +588,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
             [
                 'Bucket' => $this->bucket,
                 'Key' => $path,
-                'Body' => $body
+                'Body' => $body,
             ]
         );
 
@@ -595,11 +598,12 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
         }
 
         $this->result = $this->normalizeResponse($result->toArray());
+
         return true;
     }
 
     /**
-     * Check if the path contains only directories
+     * Check if the path contains only directories.
      *
      * @param string $path
      *
@@ -607,13 +611,11 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     private function isOnlyDir($path)
     {
-        return substr($path, -1) === '/';
+        return '/' === substr($path, -1);
     }
 
     /**
      * Get options from the config.
-     *
-     * @param Config $config
      *
      * @return array
      */
@@ -625,7 +627,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
             // For local reference
             $options['visibility'] = $visibility;
             // For external reference
-            $options['ACL'] = $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private';
+            $options['ACL'] = AdapterInterface::VISIBILITY_PUBLIC === $visibility ? 'public-read' : 'private';
         }
 
         if ($mimetype = $config->get('mimetype')) {
@@ -648,7 +650,6 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * Normalize the object result array.
      *
-     * @param array  $response
      * @param string $path
      *
      * @return array
@@ -673,7 +674,7 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     }
 
     /**
-     * Raw URL encode a key and allow for '/' characters
+     * Raw URL encode a key and allow for '/' characters.
      *
      * @param string $key Key to encode
      *
@@ -683,5 +684,4 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     {
         return str_replace('%2F', '/', rawurlencode($key));
     }
-
 }
