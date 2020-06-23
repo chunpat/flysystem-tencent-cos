@@ -1,6 +1,6 @@
 <h1 align="center"> flysystem-tencent-cos </h1>
 
-<p align="center"> Tencent Cos Storage adapter for flysystem - a PHP filesystem abstraction.</p>
+<p align="center"> Tencent Cloud Cos Storage adapter for flysystem - a PHP filesystem abstraction.</p>
 
 
 ## Installing
