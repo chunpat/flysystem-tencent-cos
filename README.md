@@ -3,6 +3,8 @@
 <p align="center"> Tencent Cloud Cos Storage adapter for flysystem - a PHP filesystem abstraction.</p>
 
 ![StyleCI build status](https://github.styleci.io/repos/274198375/shield) 
+[![Total Downloads](https://poser.pugx.org/chunpat/flysystem-tencent-cos/downloads)](https://packagist.org/packages/chunpat/flysystem-tencent-cos)
+[![License](https://poser.pugx.org/chunpat/flysystem-tencent-cos/license)](https://packagist.org/packages/chunpat/flysystem-tencent-cos)
 
 ## Installing
 
