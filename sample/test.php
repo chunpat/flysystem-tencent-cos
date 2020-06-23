@@ -6,7 +6,6 @@
  *
  * This source file is subject to the MIT license that is bundled.
  */
-
 require dirname(__FILE__).'/../vendor/autoload.php';
 
 $secretId = '######'; //"云 API 密钥 SecretId";
